@@ -20,13 +20,24 @@ let file x =
     | [|""; name|]     -> name
     |                _ -> ""
 
+let simpleList k (headers,rows) : ListContent =
+    match headers with
+    | None -> new ListContent(k)
+    | Some a ->
+        let h = Seq.toList a
+        let r = List.fold (fun acc (x:CsvRow) -> (x.Columns |> Array.toList) :: acc) [] (rows |> Seq.toList)
+        let row = List.fold (fun acc (k,v) -> new FieldContent(k, System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(v))) :> IContentItem :: acc) []
+        let t = new ListContent(k)
+        let _ = do printfn "Headers: %A\nRows: %A" h r
+            in List.fold (fun acc x -> t.AddItem((row (List.zip h x)) |> List.toArray)) t r
+
 let table k (headers,rows) : TableContent =
     match headers with
     | None -> new TableContent(k)
     | Some a ->
         let h = Seq.toList a
         let r = List.fold (fun acc (x:CsvRow) -> (x.Columns |> Array.toList) :: acc) [] (rows |> Seq.toList)
-        let row = List.fold (fun acc (k,v) -> new FieldContent(k,v) :> IContentItem :: acc) []
+        let row = List.fold (fun acc (k,v) -> new FieldContent(k, System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(v))) :> IContentItem :: acc) []
         let t = new TableContent(k)
         let _ = t.Clear
         let _ = do printfn "Headers: %A\nRows: %A" h r
@@ -34,11 +45,12 @@ let table k (headers,rows) : TableContent =
 
 let field x =
     match x with
-    | [|""; "scalar"; k; v; ""|] -> new FieldContent(k,v) :> IContentItem
-    | [|""; "base64"; k; v; ""|] -> new FieldContent(k, System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(v))) :> IContentItem
-    | [|""; "vector"; k; v; ""|] -> table k (read v) :> IContentItem
-    | [|""; "zimage"; k; v; ""|] -> new ImageContent(k, File.ReadAllBytes(v)) :> IContentItem
-    |                          _ -> new EmptyContent()    :> IContentItem
+    | [|""; "scalar";     k; v; ""|] -> new FieldContent(k,v) :> IContentItem
+    | [|""; "base64";     k; v; ""|] -> new FieldContent(k, System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(v))) :> IContentItem
+    | [|""; "vector";     k; v; ""|] -> table k (read v) :> IContentItem
+    | [|""; "zimage";     k; v; ""|] -> new ImageContent(k, File.ReadAllBytes(v)) :> IContentItem
+    | [|""; "simpleList"; k; v; ""|] -> simpleList k (read v) :> IContentItem
+    |                              _ -> new EmptyContent()    :> IContentItem
 
 let ret (_:unit) = 0
 let tmp (_:TemplateProcessor) = ()

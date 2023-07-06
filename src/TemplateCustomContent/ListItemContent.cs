@@ -61,6 +61,12 @@ namespace TemplateEngine.Docx
 		{
 			return new ListItemContent(name, value, nestedfields);
 		}
+
+		public ListItemContent Clear()
+		{
+			NestedFields = new List<ListItemContent>();
+			return this;
+		}
 		public new ListItemContent AddField(string name, string value)
 		{
 			return (ListItemContent)base.AddField(name, value);
