@@ -54,7 +54,7 @@ namespace TemplateEngine.Docx.Processors
 			// and continue with next field.
 			if (contentControl == null)
 			{
-				processResult.AddError(new ContentControlNotFoundError(field));
+				//processResult.AddError(new ContentControlNotFoundError(field));
 				return processResult;
 			}
 

@@ -225,7 +225,7 @@ namespace TemplateEngine.Docx.Processors
 			// If there isn't a list with that name, add an error to the error string.
 			if (contentControl == null)
 			{
-				processResult.AddError(new ContentControlNotFoundError(list));
+				//processResult.AddError(new ContentControlNotFoundError(list));
 
 				return processResult;
 			}

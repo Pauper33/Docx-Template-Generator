@@ -69,7 +69,7 @@ namespace TemplateEngine.Docx.Processors
 			// and continue with next table.
 			if (contentControl == null)
 			{
-				processResult.AddError(new ContentControlNotFoundError(table));
+				//processResult.AddError(new ContentControlNotFoundError(table));
 
 				return processResult;
 			}
